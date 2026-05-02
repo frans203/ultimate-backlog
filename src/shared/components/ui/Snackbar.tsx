@@ -37,8 +37,8 @@ export function Snackbar() {
   if (!message) return null
 
   return (
-    <div className={`snackbar ${visible ? 'show' : ''}`}>
-      <span>{message.text}</span>
+    <div className={`snackbar max-w-[calc(100vw-2rem)] md:max-w-[52rem] ${visible ? 'show' : ''}`}>
+      <span className="truncate max-w-[240px] md:max-w-none">{message.text}</span>
       {message.undoFn && (
         <button
           className="text-xs uppercase tracking-wider px-3 py-1 border border-white/20 hover:border-white/40 bg-transparent text-white font-mono cursor-pointer"

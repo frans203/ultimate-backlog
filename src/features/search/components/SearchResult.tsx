@@ -31,6 +31,7 @@ export function SearchResult({ game, alreadyAdded, onAdd, onClick }: SearchResul
         </p>
         <p className="text-xs truncate text-text-muted">
           {(game.platforms || []).slice(0, 4).map((p) => p.platform.name).join(', ')}
+          {game.playtime > 0 && ` · ~${game.playtime}h`}
         </p>
       </div>
       {alreadyAdded ? (

@@ -18,16 +18,16 @@ export function useAddGame() {
         .insert({
           user_id: user.id,
           rawg_id: game.rawg.id,
-          name: game.rawg.name,
-          cover: game.rawg.background_image || '',
-          released: game.rawg.released || null,
+          title: game.rawg.name,
+          cover_url: game.rawg.background_image || '',
+          release_date: game.rawg.released || null,
           genres: (game.rawg.genres || []).map((g) => g.name),
           platforms: (game.rawg.platforms || []).map((p) => p.platform.name),
-          description: game.description || '',
+          rawg_rating: game.rawg.rating || null,
           user_rating: 0,
           status: 'backlog' as BacklogStatus,
           notes: '',
-          estimated_hours: Math.floor(Math.random() * 60) + 15,
+          estimated_hours: game.rawg.playtime || 0,
         })
         .select()
         .single()
@@ -37,7 +37,7 @@ export function useAddGame() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['games'] })
       playClick()
-      showSnackbar(`"${data.name}" adicionado ao backlog`, () => {
+      showSnackbar(`"${data.title}" adicionado ao backlog`, () => {
         supabase.from('games').delete().eq('id', data.id).then(() => {
           queryClient.invalidateQueries({ queryKey: ['games'] })
         })
@@ -105,6 +105,23 @@ export function useUpdateNotes() {
       const { error } = await supabase
         .from('games')
         .update({ notes })
+        .eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['games'] })
+    },
+  })
+}
+
+export function useUpdateHours() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, hours }: { id: string; hours: number }) => {
+      const { error } = await supabase
+        .from('games')
+        .update({ estimated_hours: hours })
         .eq('id', id)
       if (error) throw error
     },

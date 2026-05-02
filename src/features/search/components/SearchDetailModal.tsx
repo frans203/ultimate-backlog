@@ -24,8 +24,6 @@ export function SearchDetailModal({ game, isOpen, onClose, onAdd, alreadyAdded }
   const desc = details?.description_raw || ''
   const needsTruncate = desc.length > 300
   const displayDesc = expanded || !needsTruncate ? desc : desc.substring(0, 300) + '...'
-  const estimated = Math.floor(Math.random() * 60) + 15
-
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="p-4 md:p-6">
@@ -51,7 +49,7 @@ export function SearchDetailModal({ game, isOpen, onClose, onAdd, alreadyAdded }
               {game.released && <p>Lançamento: {game.released}</p>}
               <p>Gêneros: {(game.genres || []).map((g) => g.name).join(', ') || '?'}</p>
               <p>Plataformas: {(game.platforms || []).map((p) => p.platform.name).join(', ') || '?'}</p>
-              <p>Horas estimadas: ~{estimated}h</p>
+              {game.playtime > 0 && <p>Tempo médio: ~{game.playtime}h</p>}
               {game.rating ? <p>Rating RAWG: {game.rating}/5</p> : null}
             </div>
           </div>

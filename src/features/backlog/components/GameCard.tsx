@@ -28,9 +28,11 @@ export function GameCard({ game, onClick }: GameCardProps) {
               {game.released.substring(0, 4)}
             </div>
           )}
-          <div className="text-xs mt-1 text-text-secondary">
-            ~{game.estimated_hours}h
-          </div>
+          {game.estimated_hours > 0 && (
+            <div className="text-xs mt-1 text-text-secondary">
+              ~{game.estimated_hours}h
+            </div>
+          )}
         </div>
       </div>
       <div className="p-2">

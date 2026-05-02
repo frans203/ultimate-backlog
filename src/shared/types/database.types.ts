@@ -36,6 +36,7 @@ export interface RawgGame {
   genres: { id: number; name: string }[]
   platforms: { platform: { id: number; name: string } }[]
   rating: number
+  playtime: number
 }
 
 export interface RawgGameDetail extends RawgGame {

@@ -44,7 +44,7 @@ export function GameStats({ games }: GameStatsProps) {
         </StatCard>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 mb-4">
+      <div className="grid grid-cols-2 gap-2.5 mb-4">
         <StatCard>
           <div className="text-xs uppercase tracking-wider mb-1 text-text-muted">Horas Restantes</div>
           <div className="text-xl font-bold">
@@ -55,16 +55,6 @@ export function GameStats({ games }: GameStatsProps) {
           <div className="text-xs uppercase tracking-wider mb-1 text-text-muted">Horas Completas</div>
           <div className="text-xl font-bold">
             ~{hoursCompleted}<span className="text-xs font-normal">h</span>
-          </div>
-        </StatCard>
-        <StatCard>
-          <div className="text-xs uppercase tracking-wider mb-1 text-text-muted">Estimativa / Semana</div>
-          <div className="text-xl font-bold">
-            ~{hoursRemaining > 0 ? Math.round(hoursRemaining / 12) : 0}
-            <span className="text-xs font-normal">h</span>
-          </div>
-          <div className="text-xs text-text-secondary">
-            {hoursRemaining > 0 ? Math.ceil(hoursRemaining / 10) + ' semanas' : '--'}
           </div>
         </StatCard>
       </div>

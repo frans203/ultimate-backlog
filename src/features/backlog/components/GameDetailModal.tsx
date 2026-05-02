@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Modal, StarRating, Badge, CoverFrame, Button } from '@/shared/components/ui'
 import { ConfirmDialog } from '@/shared/components/ui'
 import { STATUS_LABELS } from '@/shared/constants'
-import { useUpdateStatus, useUpdateRating, useUpdateNotes, useRemoveGame } from '../api/game-mutations'
+import { useUpdateStatus, useUpdateRating, useUpdateNotes, useUpdateHours, useRemoveGame } from '../api/game-mutations'
 import type { Game, BacklogStatus } from '@/shared/types/database.types'
 
 interface GameDetailModalProps {
@@ -17,6 +17,7 @@ export function GameDetailModal({ game, isOpen, onClose }: GameDetailModalProps)
   const updateStatus = useUpdateStatus()
   const updateRating = useUpdateRating()
   const updateNotes = useUpdateNotes()
+  const updateHours = useUpdateHours()
   const removeGame = useRemoveGame()
 
   if (!game) return null
@@ -51,7 +52,21 @@ export function GameDetailModal({ game, isOpen, onClose }: GameDetailModalProps)
                 {game.released && <p>Lançamento: {game.released}</p>}
                 <p>Gêneros: {(game.genres || []).join(', ') || '?'}</p>
                 <p>Plataformas: {(game.platforms || []).join(', ') || '?'}</p>
-                <p>Horas estimadas: ~{game.estimated_hours}h</p>
+                <p className="flex items-center gap-1">
+                  Horas estimadas: ~
+                  <input
+                    type="number"
+                    min={0}
+                    className="search-input w-16 text-xs px-1 py-0.5 inline-block"
+                    defaultValue={game.estimated_hours || 0}
+                    onBlur={(e) => {
+                      const hours = Math.max(0, parseInt(e.target.value) || 0)
+                      if (hours !== game.estimated_hours) {
+                        updateHours.mutate({ id: game.id, hours })
+                      }
+                    }}
+                  />h
+                </p>
               </div>
             </div>
           </div>

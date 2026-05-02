@@ -1,0 +1,2539 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ULTIMATE BACKLOG</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ["JetBrains Mono", "monospace"],
+              display: ["Deltha", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* ============================================================
+       FONTS
+       ============================================================ */
+      @font-face {
+        font-family: "Deltha";
+        src: url("fonts/Deltha.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Savery";
+        src: url("fonts/Savery.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Savery Outline";
+        src: url("fonts/Savery-Outline.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      /* ============================================================
+       CSS CUSTOM PROPERTIES
+       ============================================================ */
+      :root {
+        --bg-base: #0a0a0a;
+        --bg-surface: #111111;
+        --bg-elevated: #1a1a1a;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(255, 255, 255, 0.15);
+        --text-primary: #e0e0e0;
+        --text-secondary: #888888;
+        --text-muted: #555555;
+        --neon-red: #ff0040;
+        --neon-blue: #0ea5e9;
+        --neon-green: #22c55e;
+        --neon-amber: #f59e0b;
+        --neon-gray: #6b7280;
+      }
+
+      /* ============================================================
+       BASE STYLES
+       ============================================================ */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "JetBrains Mono", monospace;
+        background: var(--bg-base);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-base);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--neon-red);
+      }
+
+      /* ============================================================
+       ANIMATED BORDER GLOW
+       ============================================================ */
+      @property --border-angle {
+        syntax: "<angle>";
+        initial-value: 0deg;
+        inherits: false;
+      }
+
+      .animated-border {
+        --border-angle: 0deg;
+        border: 1px solid transparent;
+        background:
+          linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
+          conic-gradient(
+              from var(--border-angle),
+              transparent 60%,
+              var(--neon-red),
+              transparent 80%
+            )
+            border-box;
+        animation: borderSpin 4s linear infinite;
+      }
+
+      .animated-border-slow {
+        --border-angle: 0deg;
+        border: 1px solid transparent;
+        background:
+          linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
+          conic-gradient(
+              from var(--border-angle),
+              transparent 70%,
+              rgba(255, 0, 64, 0.5),
+              transparent 85%
+            )
+            border-box;
+        animation: borderSpin 8s linear infinite;
+      }
+
+      @keyframes borderSpin {
+        to {
+          --border-angle: 360deg;
+        }
+      }
+
+      /* (scanline overlay now handled by CRT effect on body::after) */
+
+      /* ============================================================
+       NEON GLOW
+       ============================================================ */
+      .neon-glow {
+        box-shadow: 0 0 8px rgba(255, 0, 64, 0.3);
+      }
+      .neon-glow-strong {
+        box-shadow:
+          0 0 15px rgba(255, 0, 64, 0.5),
+          0 0 30px rgba(255, 0, 64, 0.2);
+      }
+      .neon-text {
+        text-shadow: 0 0 10px rgba(255, 0, 64, 0.5);
+      }
+
+      /* ============================================================
+       COVER FRAME (DASHED BORDER)
+       ============================================================ */
+      .cover-frame {
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        position: relative;
+      }
+      .cover-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* ============================================================
+       CARD TILT
+       ============================================================ */
+      .game-card {
+        transition:
+          transform 0.15s ease-out,
+          box-shadow 0.3s;
+        will-change: transform;
+        cursor: pointer;
+        position: relative;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+      }
+      .game-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Trailing dot on card border — masked to border edge only */
+      .game-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s;
+        padding: 2px;
+        --border-angle: 0deg;
+        background: conic-gradient(
+          from var(--border-angle),
+          transparent 50%,
+          rgba(255, 255, 255, 0.05) 60%,
+          rgba(255, 255, 255, 0.3) 66%,
+          white 69%,
+          rgba(255, 255, 255, 0.3) 72%,
+          rgba(255, 255, 255, 0.05) 76%,
+          transparent 82%
+        );
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+        animation: borderSpin 12s linear infinite;
+      }
+      .game-card:hover::before {
+        opacity: 1;
+      }
+
+      /* ============================================================
+       SIDEBAR (DESKTOP)
+       ============================================================ */
+      #sidebar {
+        width: 60px;
+        min-height: 100vh;
+        background: var(--bg-surface);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 0;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 40;
+        overflow: hidden;
+      }
+      #sidebar:hover {
+        width: 200px;
+      }
+      #sidebar .nav-label {
+        opacity: 0;
+        white-space: nowrap;
+        transition: opacity 0.15s;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      #sidebar:hover .nav-label {
+        opacity: 1;
+      }
+      #sidebar .logo-text {
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+      }
+      #sidebar:hover .logo-text {
+        opacity: 1;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 18px;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+        font-size: inherit;
+        text-align: left;
+      }
+      .nav-item:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .nav-item.active {
+        color: var(--neon-red);
+        border-right: 2px solid var(--neon-red);
+      }
+      .nav-item svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      /* Main content offset for sidebar */
+      #main {
+        margin-left: 60px;
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 100vh;
+      }
+      #sidebar:hover ~ #main {
+        margin-left: 200px;
+      }
+
+      /* ============================================================
+       BOTTOM NAV (MOBILE)
+       ============================================================ */
+      #bottom-nav {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border-color);
+        z-index: 50;
+        padding: 8px 0 env(safe-area-inset-bottom, 8px);
+      }
+      .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 4px 0;
+        flex: 1;
+      }
+      .bottom-nav-item.active {
+        color: var(--neon-red);
+      }
+      .bottom-nav-item svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      /* ============================================================
+       TABS
+       ============================================================ */
+      .tab-btn {
+        padding: 8px 16px;
+        font-family: inherit;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: none;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .tab-btn:hover {
+        border-color: var(--border-hover);
+        color: var(--text-primary);
+      }
+      .tab-btn.active {
+        border-color: var(--neon-red);
+        color: var(--neon-red);
+        box-shadow: 0 0 8px rgba(255, 0, 64, 0.2);
+      }
+
+      /* ============================================================
+       STATUS DOTS
+       ============================================================ */
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .status-backlog .status-dot,
+      .dot-backlog {
+        background: var(--neon-gray);
+      }
+      .status-playing .status-dot,
+      .dot-playing {
+        background: var(--neon-blue);
+        box-shadow: 0 0 6px rgba(14, 165, 233, 0.5);
+        animation: statusPulse 2s ease-in-out infinite;
+      }
+      @keyframes statusPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 6px rgba(14, 165, 233, 0.5);
+          transform: scale(1);
+        }
+        50% {
+          box-shadow:
+            0 0 10px rgba(14, 165, 233, 0.9),
+            0 0 18px rgba(14, 165, 233, 0.3);
+          transform: scale(1.5);
+        }
+      }
+      .status-completed .status-dot,
+      .dot-completed {
+        background: var(--neon-green);
+        box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+      }
+      .status-dropped .status-dot,
+      .dot-dropped {
+        background: var(--neon-red);
+        box-shadow: 0 0 6px rgba(255, 0, 64, 0.5);
+      }
+      .status-on_hold .status-dot,
+      .dot-on_hold {
+        background: var(--neon-amber);
+        box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+      }
+
+      /* ============================================================
+       PROGRESS BAR
+       ============================================================ */
+      .progress-bar {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        position: relative;
+      }
+      .progress-fill {
+        height: 100%;
+        background: var(--neon-red);
+        box-shadow: 0 0 10px rgba(255, 0, 64, 0.6);
+        transition: width 0.5s ease;
+      }
+
+      /* ============================================================
+       TERMINAL CURSOR (EMPTY STATES)
+       ============================================================ */
+      .terminal-text::after {
+        content: "█";
+        animation: blink 1s step-start infinite;
+        color: var(--neon-red);
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* ============================================================
+       STAR RATING
+       ============================================================ */
+      .star-rating .star {
+        cursor: pointer;
+        color: #333;
+        font-size: 20px;
+        transition:
+          color 0.15s,
+          text-shadow 0.15s;
+      }
+      .star-rating .star.filled {
+        color: var(--neon-amber);
+        text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+      }
+      .star-rating .star:hover {
+        color: var(--neon-amber);
+      }
+
+      /* ============================================================
+       MODAL
+       ============================================================ */
+      #modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        z-index: 100;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      #modal {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        width: 100%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+      }
+      @media (min-width: 769px) {
+        #modal {
+          max-height: 70vh;
+        }
+      }
+
+      /* ============================================================
+       SNACKBAR
+       ============================================================ */
+      #snackbar {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        padding: 12px 20px;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 12px;
+        transition: transform 0.3s ease;
+        white-space: nowrap;
+      }
+      #snackbar.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ============================================================
+       CONFIRM MODAL
+       ============================================================ */
+      #confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 150;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      /* ============================================================
+       SEARCH INPUT
+       ============================================================ */
+      .search-input {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 16px;
+        width: 100%;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .search-input:focus {
+        border-color: var(--neon-red);
+        box-shadow: 0 0 8px rgba(255, 0, 64, 0.15);
+      }
+      .search-input::placeholder {
+        color: var(--text-muted);
+      }
+
+      /* ============================================================
+       CARD HOVER OVERLAY (INFO)
+       ============================================================ */
+      .card-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.95) 100%);
+        opacity: 0;
+        transition: opacity 0.25s;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 12px;
+      }
+      .game-card:hover .card-overlay {
+        opacity: 1;
+      }
+
+      /* ============================================================
+       SELECT DROPDOWN
+       ============================================================ */
+      .cyber-select {
+        background: var(--bg-base);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 11px;
+        padding: 6px 28px 6px 10px;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .cyber-select:focus {
+        border-color: var(--neon-red);
+      }
+
+      /* ============================================================
+       ADD BUTTON (SEARCH RESULTS)
+       ============================================================ */
+      .add-btn {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--neon-green);
+        color: #000;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .add-btn:hover {
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+        transform: scale(1.1);
+      }
+
+      /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+        #main {
+          margin-left: 0 !important;
+        }
+        #bottom-nav {
+          display: flex;
+        }
+        #snackbar {
+          bottom: 80px;
+        }
+
+        .add-btn {
+          opacity: 1 !important;
+        }
+      }
+
+      @media (min-width: 769px) {
+        .add-btn {
+          opacity: 0;
+          transition:
+            opacity 0.2s,
+            box-shadow 0.2s,
+            transform 0.2s;
+        }
+        .search-result:hover .add-btn {
+          opacity: 1;
+        }
+      }
+
+      /* ============================================================
+       PAGE TRANSITION
+       ============================================================ */
+      .page-section {
+        animation: fadeIn 0.2s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ============================================================
+       LOADING PULSE
+       ============================================================ */
+      .loading-pulse {
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* ============================================================
+       STAT CARD
+       ============================================================ */
+      .stat-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        padding: 16px;
+        transition: border-color 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card:hover {
+        border-color: var(--border-hover);
+      }
+      /* Scan line on stat cards */
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 0, 64, 0.3),
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 0, 64, 0.3),
+          transparent
+        );
+        box-shadow: 0 0 8px rgba(255, 0, 64, 0.2);
+        top: -1px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 5;
+        pointer-events: none;
+      }
+      .stat-card:hover::after {
+        opacity: 1;
+        animation: scanMove 1.8s ease-in-out infinite;
+      }
+
+      /* ============================================================
+       CRT MONITOR EFFECT (noise + scanlines + vignette + flicker)
+       ============================================================ */
+      /* Layer 1: Subtle grain noise */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 512px 512px;
+        animation: noiseShift 0.15s steps(3) infinite;
+      }
+      @keyframes noiseShift {
+        0% { transform: translate(0, 0); }
+        33% { transform: translate(-1px, 1px); }
+        66% { transform: translate(1px, -1px); }
+        100% { transform: translate(0, 0); }
+      }
+
+      /* Layer 2: Horizontal CRT scanlines — prominent */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          to bottom,
+          transparent 0px,
+          transparent 3px,
+          rgba(0, 0, 0, 0.35) 3px,
+          rgba(0, 0, 0, 0.35) 5px
+        );
+      }
+
+      /* Layer 3: Vignette (darkened edges) */
+      #crt-vignette {
+        position: fixed;
+        inset: 0;
+        z-index: 9997;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse at center,
+          transparent 50%,
+          rgba(0, 0, 0, 0.45) 100%
+        );
+      }
+
+
+      /* Subtle CRT flicker */
+      @keyframes crtFlicker {
+        0% { opacity: 0.97; }
+        5% { opacity: 1; }
+        10% { opacity: 0.98; }
+        15% { opacity: 1; }
+        95% { opacity: 1; }
+        97% { opacity: 0.96; }
+        100% { opacity: 1; }
+      }
+      body {
+        animation: crtFlicker 4s infinite;
+      }
+
+      /* CRT disabled state */
+      body.crt-off {
+        animation: none;
+      }
+      body.crt-off::before,
+      body.crt-off::after {
+        display: none;
+      }
+      body.crt-off #crt-vignette {
+        display: none;
+      }
+
+      /* ============================================================
+       SCAN LINE HOVER EFFECT
+       ============================================================ */
+      .scan-hover {
+        position: relative;
+        overflow: hidden;
+      }
+      .scan-hover::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 0, 64, 0.4),
+          rgba(255, 255, 255, 0.15),
+          rgba(255, 0, 64, 0.4),
+          transparent
+        );
+        box-shadow: 0 0 12px rgba(255, 0, 64, 0.3);
+        top: -2px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 5;
+        pointer-events: none;
+      }
+      .scan-hover:hover::after {
+        opacity: 1;
+        animation: scanMove 1.8s ease-in-out infinite;
+      }
+      @keyframes scanMove {
+        0% { top: -2px; }
+        100% { top: calc(100% + 2px); }
+      }
+
+      /* ============================================================
+       LOGO GLITCH EFFECT
+       ============================================================ */
+      .logo-glitch {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+      }
+      .logo-glitch:hover {
+        animation: logoGlitch 0.3s steps(2) 3;
+      }
+      .logo-glitch::before,
+      .logo-glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .logo-glitch:hover::before {
+        opacity: 0.8;
+        color: #0ff;
+        animation: glitchClip1 0.4s steps(2) infinite;
+        clip-path: inset(10% 0 60% 0);
+        transform: translateX(-3px);
+      }
+      .logo-glitch:hover::after {
+        opacity: 0.8;
+        color: var(--neon-red);
+        animation: glitchClip2 0.4s steps(2) infinite reverse;
+        clip-path: inset(50% 0 10% 0);
+        transform: translateX(3px);
+      }
+      @keyframes logoGlitch {
+        0% { transform: translate(0); }
+        25% { transform: translate(-2px, 1px); }
+        50% { transform: translate(2px, -1px); }
+        75% { transform: translate(-1px, -1px); }
+        100% { transform: translate(0); }
+      }
+      @keyframes glitchClip1 {
+        0% { clip-path: inset(15% 0 60% 0); transform: translateX(-3px); }
+        33% { clip-path: inset(50% 0 10% 0); transform: translateX(2px); }
+        66% { clip-path: inset(20% 0 40% 0); transform: translateX(-2px); }
+        100% { clip-path: inset(10% 0 55% 0); transform: translateX(3px); }
+      }
+      @keyframes glitchClip2 {
+        0% { clip-path: inset(60% 0 5% 0); transform: translateX(3px); }
+        33% { clip-path: inset(5% 0 50% 0); transform: translateX(-3px); }
+        66% { clip-path: inset(40% 0 20% 0); transform: translateX(2px); }
+        100% { clip-path: inset(55% 0 15% 0); transform: translateX(-2px); }
+      }
+
+      /* ============================================================
+       BOOT-UP EFFECT (PAGE TRANSITION)
+       ============================================================ */
+      .boot-up > * {
+        opacity: 0;
+        transform: translateY(6px);
+        animation: bootIn 0.4s ease forwards;
+      }
+      .boot-up > *:nth-child(1) { animation-delay: 0.05s; }
+      .boot-up > *:nth-child(2) { animation-delay: 0.12s; }
+      .boot-up > *:nth-child(3) { animation-delay: 0.19s; }
+      .boot-up > *:nth-child(4) { animation-delay: 0.26s; }
+      .boot-up > *:nth-child(5) { animation-delay: 0.33s; }
+      .boot-up > *:nth-child(6) { animation-delay: 0.40s; }
+      .boot-up > *:nth-child(7) { animation-delay: 0.47s; }
+      .boot-up > *:nth-child(8) { animation-delay: 0.54s; }
+      @keyframes bootIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ============================================================
+       PAGE GLITCH TRANSITION (RGB SPLIT)
+       ============================================================ */
+      .page-glitch {
+        animation: pageGlitch 0.25s steps(4) 1;
+      }
+      @keyframes pageGlitch {
+        0% { filter: none; transform: translate(0); }
+        10% { filter: none; transform: translate(-3px, 0); }
+        20% { filter: hue-rotate(90deg) saturate(3); transform: translate(2px, 1px); }
+        30% { filter: none; transform: translate(0, -1px); }
+        40% { filter: hue-rotate(-90deg) saturate(2); transform: translate(1px, 0); }
+        50% { filter: none; transform: translate(-1px, 1px); }
+        60% { filter: hue-rotate(180deg); transform: translate(2px, 0); }
+        70% { filter: none; transform: translate(0); }
+        100% { filter: none; transform: translate(0); }
+      }
+
+      /* ============================================================
+       STATUS CHANGE FLASH
+       ============================================================ */
+      @keyframes statusFlash {
+        0% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
+        30% { box-shadow: inset 0 0 40px var(--flash-color); }
+        100% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
+      }
+      .status-flash {
+        animation: statusFlash 0.5s ease-out 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- CRT overlays -->
+    <div id="crt-vignette"></div>
+
+    <!-- ============================================================
+       SIDEBAR (DESKTOP)
+       ============================================================ -->
+    <aside id="sidebar">
+      <!-- Logo -->
+      <div class="w-full px-4 mb-8 flex items-center gap-3 h-10">
+        <div
+          class="text-xl font-bold text-white flex-shrink-0 logo-glitch"
+          data-text="UB"
+          style="font-family: &quot;Deltha&quot;; color: var(--neon-red)"
+        >
+          UB
+        </div>
+        <div
+          class="logo-text text-xs tracking-widest text-white logo-glitch"
+          data-text="ULTIMATE BACKLOG"
+          style="font-family: &quot;Deltha&quot;"
+        >
+          ULTIMATE<br />BACKLOG
+        </div>
+      </div>
+
+      <!-- Nav Items -->
+      <nav class="flex flex-col w-full flex-1">
+        <button
+          class="nav-item active"
+          data-page="dashboard"
+          onclick="navigateTo('dashboard')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+          <span class="nav-label">Dashboard</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="backlog"
+          onclick="navigateTo('backlog')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" />
+            <circle cx="4" cy="6" r="1" fill="currentColor" />
+            <circle cx="4" cy="12" r="1" fill="currentColor" />
+            <circle cx="4" cy="18" r="1" fill="currentColor" />
+          </svg>
+          <span class="nav-label">Backlog</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="search"
+          onclick="navigateTo('search')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <span class="nav-label">Buscar</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="profile"
+          onclick="navigateTo('profile')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+          </svg>
+          <span class="nav-label">Perfil</span>
+        </button>
+      </nav>
+
+      <!-- CRT Toggle -->
+      <button
+        class="nav-item mt-auto"
+        id="crt-toggle-sidebar"
+        onclick="toggleCRT()"
+        style="opacity: 0.6"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <rect x="2" y="3" width="20" height="14" rx="1" />
+          <path d="M8 21h8M12 17v4" />
+          <path d="M5 7h14" stroke-dasharray="2 2" opacity="0.5" />
+          <path d="M5 10h14" stroke-dasharray="2 2" opacity="0.5" />
+          <path d="M5 13h14" stroke-dasharray="2 2" opacity="0.5" />
+        </svg>
+        <span class="nav-label">CRT</span>
+      </button>
+
+      <!-- Logout -->
+      <button
+        class="nav-item"
+        onclick="playClick()"
+        style="color: var(--neon-red); opacity: 0.6"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path
+            d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
+          />
+        </svg>
+        <span class="nav-label">Sair</span>
+      </button>
+    </aside>
+
+    <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+    <main id="main" class="p-4 md:p-6 pb-24 md:pb-6">
+      <!-- Pages rendered dynamically by JS -->
+      <div id="page-content"></div>
+    </main>
+
+    <!-- ============================================================
+       BOTTOM NAV (MOBILE)
+       ============================================================ -->
+    <nav id="bottom-nav">
+      <button
+        class="bottom-nav-item active"
+        data-page="dashboard"
+        onclick="navigateTo('dashboard')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+        </svg>
+        INICIO
+      </button>
+      <button
+        class="bottom-nav-item"
+        data-page="backlog"
+        onclick="navigateTo('backlog')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        BACKLOG
+      </button>
+      <button
+        class="bottom-nav-item"
+        data-page="search"
+        onclick="navigateTo('search')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+        BUSCAR
+      </button>
+      <button
+        class="bottom-nav-item"
+        data-page="profile"
+        onclick="navigateTo('profile')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+        </svg>
+        PERFIL
+      </button>
+    </nav>
+
+    <!-- ============================================================
+       MODAL OVERLAY
+       ============================================================ -->
+    <div id="modal-overlay">
+      <div id="modal" class="animated-border"></div>
+    </div>
+
+    <!-- ============================================================
+       CONFIRM MODAL
+       ============================================================ -->
+    <div id="confirm-overlay"></div>
+
+    <!-- ============================================================
+       SNACKBAR
+       ============================================================ -->
+    <div id="snackbar">
+      <span id="snackbar-text"></span>
+      <button
+        id="snackbar-undo"
+        class="text-xs uppercase tracking-wider px-3 py-1 border border-white/20 hover:border-white/40 bg-transparent text-white font-mono cursor-pointer"
+        style="display: none"
+      >
+        Desfazer
+      </button>
+    </div>
+
+    <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+    <script>
+      // ============================================================
+      // STATE
+      // ============================================================
+      const RAWG_KEY = "a44c8ac2144e4c81ad97fd379ddc42b4";
+      const RAWG_BASE = "https://api.rawg.io/api";
+
+      const STATUS_LABELS = {
+        backlog: "Backlog",
+        playing: "Jogando",
+        completed: "Completo",
+        dropped: "Dropado",
+        on_hold: "Em Espera",
+      };
+
+      const STATUS_COLORS = {
+        backlog: "var(--neon-gray)",
+        playing: "var(--neon-blue)",
+        completed: "var(--neon-green)",
+        dropped: "var(--neon-red)",
+        on_hold: "var(--neon-amber)",
+      };
+
+      let state = {
+        currentPage: "dashboard",
+        games: [],
+        searchResults: [],
+        searchQuery: "",
+        searchLoading: false,
+        activeTab: "all",
+        sortBy: "added_at",
+        filterPlatform: "",
+        filterGenre: "",
+      };
+
+      let snackbarTimeout = null;
+      let lastRemovedGame = null;
+
+      // ============================================================
+      // PERSISTENCE
+      // ============================================================
+      function saveGames() {
+        localStorage.setItem("ub_games", JSON.stringify(state.games));
+      }
+
+      function loadGames() {
+        const data = localStorage.getItem("ub_games");
+        if (data) {
+          state.games = JSON.parse(data);
+        }
+      }
+
+      // ============================================================
+      // SOUND ENGINE (Web Audio API)
+      // ============================================================
+      let audioCtx = null;
+
+      function ensureAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+      }
+
+      function playClick() {
+        ensureAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = "square";
+        osc.frequency.value = 900;
+        gain.gain.value = 0.06;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          audioCtx.currentTime + 0.08,
+        );
+        osc.stop(audioCtx.currentTime + 0.08);
+      }
+
+      function playStatusChange() {
+        ensureAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = "sine";
+        osc.frequency.value = 600;
+        gain.gain.value = 0.08;
+        osc.start();
+        osc.frequency.linearRampToValueAtTime(
+          1000,
+          audioCtx.currentTime + 0.15,
+        );
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          audioCtx.currentTime + 0.2,
+        );
+        osc.stop(audioCtx.currentTime + 0.2);
+      }
+
+      function playCompleted() {
+        ensureAudio();
+        [0, 0.12, 0.24].forEach((delay, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = "sine";
+          osc.frequency.value = [800, 1000, 1300][i];
+          gain.gain.value = 0;
+          gain.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+          gain.gain.linearRampToValueAtTime(
+            0.07,
+            audioCtx.currentTime + delay + 0.02,
+          );
+          gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioCtx.currentTime + delay + 0.2,
+          );
+          osc.start(audioCtx.currentTime + delay);
+          osc.stop(audioCtx.currentTime + delay + 0.2);
+        });
+      }
+
+      function playTabClick() {
+        ensureAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = "triangle";
+        osc.frequency.value = 1200;
+        gain.gain.value = 0.05;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          audioCtx.currentTime + 0.05,
+        );
+        osc.stop(audioCtx.currentTime + 0.05);
+      }
+
+      // ============================================================
+      // RAWG API
+      // ============================================================
+      async function searchGames(query) {
+        state.searchLoading = true;
+        state.searchQuery = query;
+        renderPage();
+
+        try {
+          const res = await fetch(
+            `${RAWG_BASE}/games?key=${RAWG_KEY}&search=${encodeURIComponent(query)}&page_size=12`,
+          );
+          const data = await res.json();
+          state.searchResults = data.results || [];
+        } catch (err) {
+          console.error("RAWG search error:", err);
+          state.searchResults = [];
+        }
+
+        state.searchLoading = false;
+        renderPage();
+      }
+
+      async function fetchGameDetails(gameId) {
+        try {
+          const res = await fetch(`${RAWG_BASE}/games/${gameId}?key=${RAWG_KEY}`);
+          return await res.json();
+        } catch (err) {
+          console.error("RAWG detail error:", err);
+          return null;
+        }
+      }
+
+      async function loadSampleGames() {
+        try {
+          const res = await fetch(
+            `${RAWG_BASE}/games?key=${RAWG_KEY}&page_size=6&ordering=-rating&metacritic=85,100`,
+          );
+          const data = await res.json();
+          const statuses = [
+            "completed",
+            "playing",
+            "backlog",
+            "backlog",
+            "on_hold",
+            "dropped",
+          ];
+          const ratings = [5, 4, 0, 0, 4, 2];
+          if (data.results) {
+            data.results.forEach((game, i) => {
+              state.games.push(
+                mapRawgGame(game, statuses[i] || "backlog", ratings[i] || 0),
+              );
+            });
+            saveGames();
+          }
+        } catch (err) {
+          console.error("Failed to load sample games:", err);
+        }
+      }
+
+      function mapRawgGame(raw, status = "backlog", rating = 0) {
+        return {
+          id: raw.id,
+          name: raw.name,
+          cover: raw.background_image || "",
+          released: raw.released || "",
+          genres: (raw.genres || []).map((g) => g.name),
+          platforms: (raw.platforms || []).map((p) => p.platform.name),
+          description: raw.description_raw || "",
+          rating: rating,
+          status: status,
+          notes: "",
+          estimated_hours: Math.floor(Math.random() * 60) + 15,
+          added_at: new Date().toISOString(),
+        };
+      }
+
+      // ============================================================
+      // GAME MANAGEMENT
+      // ============================================================
+      function addGame(rawgGame) {
+        if (state.games.find((g) => g.id === rawgGame.id)) {
+          showSnackbar("Jogo já está no backlog");
+          return;
+        }
+        const game = mapRawgGame(rawgGame);
+        // Use cached description from search detail if available
+        if (rawgGame._cachedDescription) {
+          game.description = rawgGame._cachedDescription;
+        }
+        state.games.unshift(game);
+        saveGames();
+        playClick();
+        showSnackbar(`"${game.name}" adicionado ao backlog`, () => {
+          state.games = state.games.filter((g) => g.id !== game.id);
+          saveGames();
+          renderPage();
+        });
+        renderPage();
+
+        // Fetch description in background if not cached
+        if (!game.description) {
+          fetchGameDetails(game.id).then((details) => {
+            if (details?.description_raw) {
+              game.description = details.description_raw;
+              saveGames();
+            }
+          });
+        }
+      }
+
+      function removeGame(id) {
+        const game = state.games.find((g) => g.id === id);
+        if (!game) return;
+
+        showConfirm(
+          `> CONFIRMAR REMOÇÃO?`,
+          `"${game.name}" será removido do backlog.`,
+          () => {
+            state.games = state.games.filter((g) => g.id !== id);
+            saveGames();
+            playClick();
+            closeModal();
+            showSnackbar(`"${game.name}" removido`, () => {
+              state.games.unshift(game);
+              saveGames();
+              renderPage();
+            });
+            renderPage();
+          },
+        );
+      }
+
+      function updateGameStatus(id, newStatus) {
+        const game = state.games.find((g) => g.id === id);
+        if (!game) return;
+        const oldStatus = game.status;
+        game.status = newStatus;
+        saveGames();
+
+        if (newStatus === "completed" && oldStatus !== "completed") {
+          playCompleted();
+        } else {
+          playStatusChange();
+        }
+
+        // Status flash color
+        const flashColors = {
+          completed: "rgba(34, 197, 94, 0.3)",
+          dropped: "rgba(255, 0, 64, 0.3)",
+          playing: "rgba(14, 165, 233, 0.3)",
+          on_hold: "rgba(245, 158, 11, 0.3)",
+          backlog: "rgba(107, 114, 128, 0.3)",
+        };
+        const flashColor = flashColors[newStatus] || "rgba(255,255,255,0.2)";
+
+        renderPage();
+        renderModal(game);
+
+        // Apply flash to the card after render
+        const card = document.querySelector(`.game-card[data-id="${id}"]`);
+        if (card) {
+          card.style.setProperty("--flash-color", flashColor);
+          card.classList.add("status-flash");
+          card.addEventListener("animationend", () => {
+            card.classList.remove("status-flash");
+          }, { once: true });
+        }
+      }
+
+      function updateGameRating(id, rating) {
+        const game = state.games.find((g) => g.id === id);
+        if (!game) return;
+        game.rating = rating;
+        saveGames();
+        playClick();
+        renderModal(game);
+      }
+
+      function updateGameNotes(id, notes) {
+        const game = state.games.find((g) => g.id === id);
+        if (!game) return;
+        game.notes = notes;
+        saveGames();
+      }
+
+      // ============================================================
+      // NAVIGATION
+      // ============================================================
+      function navigateTo(page) {
+        state.currentPage = page;
+        playTabClick();
+
+        // Update sidebar active state
+        document.querySelectorAll(".nav-item").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.page === page);
+        });
+        document.querySelectorAll(".bottom-nav-item").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.page === page);
+        });
+
+        // RGB glitch flash on page transition
+        const container = document.getElementById("page-content");
+        container.classList.add("page-glitch");
+        setTimeout(() => {
+          container.classList.remove("page-glitch");
+          renderPage();
+          // Boot-up stagger on new page content
+          const section = container.querySelector(".page-section");
+          if (section) section.classList.add("boot-up");
+        }, 250);
+      }
+
+      // ============================================================
+      // RENDERING UTILS
+      // ============================================================
+      function renderStars(rating, interactive = false, gameId = null) {
+        let html = '<div class="star-rating flex gap-1">';
+        for (let i = 1; i <= 5; i++) {
+          const filled = i <= rating ? "filled" : "";
+          const clickAttr =
+            interactive && gameId
+              ? `onclick="event.stopPropagation(); updateGameRating(${gameId}, ${i})"`
+              : "";
+          html += `<span class="star ${filled}" ${clickAttr}>★</span>`;
+        }
+        html += "</div>";
+        return html;
+      }
+
+      function getStats() {
+        const total = state.games.length;
+        const completed = state.games.filter(
+          (g) => g.status === "completed",
+        ).length;
+        const playing = state.games.filter(
+          (g) => g.status === "playing",
+        ).length;
+        const backlog = state.games.filter(
+          (g) => g.status === "backlog",
+        ).length;
+        const dropped = state.games.filter(
+          (g) => g.status === "dropped",
+        ).length;
+        const onHold = state.games.filter((g) => g.status === "on_hold").length;
+        const remaining = state.games.filter(
+          (g) => g.status !== "completed" && g.status !== "dropped",
+        );
+        const hoursRemaining = remaining.reduce(
+          (sum, g) => sum + (g.estimated_hours || 0),
+          0,
+        );
+        const hoursCompleted = state.games
+          .filter((g) => g.status === "completed")
+          .reduce((sum, g) => sum + (g.estimated_hours || 0), 0);
+        const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        // Platform counts
+        const platformCounts = {};
+        state.games.forEach((g) => {
+          (g.platforms || []).forEach((p) => {
+            platformCounts[p] = (platformCounts[p] || 0) + 1;
+          });
+        });
+
+        return {
+          total,
+          completed,
+          playing,
+          backlog,
+          dropped,
+          onHold,
+          hoursRemaining,
+          hoursCompleted,
+          pct,
+          platformCounts,
+        };
+      }
+
+      // ============================================================
+      // RENDER PAGES
+      // ============================================================
+      let isFirstRender = true;
+
+      function renderPage() {
+        const container = document.getElementById("page-content");
+        switch (state.currentPage) {
+          case "dashboard":
+            container.innerHTML = renderDashboard();
+            break;
+          case "backlog":
+            container.innerHTML = renderBacklog();
+            break;
+          case "search":
+            container.innerHTML = renderSearch();
+            break;
+          case "profile":
+            container.innerHTML = renderProfile();
+            break;
+        }
+        setupCardTilt();
+        setupSearchListeners();
+        applyCRT();
+
+        // Boot-up on first render
+        if (isFirstRender) {
+          isFirstRender = false;
+          const section = container.querySelector(".page-section");
+          if (section) section.classList.add("boot-up");
+        }
+      }
+
+      // ---- DASHBOARD ----
+      function renderDashboard() {
+        const s = getStats();
+        const recentGames = [...state.games].slice(0, 6);
+
+        // Sort platforms by count
+        const platforms = Object.entries(s.platformCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 6);
+        const maxPlatCount = platforms.length > 0 ? platforms[0][1] : 1;
+
+        return `
+        <section class="page-section">
+          <!-- Header -->
+          <div class="flex items-center gap-3 mb-8">
+            <h1 class="text-lg md:text-xl tracking-widest uppercase logo-glitch" data-text="Ultimate Backlog" style="font-family: 'Deltha'; color: var(--neon-red);">
+              Ultimate Backlog
+            </h1>
+            <div class="flex-1 h-px" style="background: var(--border-color);"></div>
+            <span class="text-xs" style="color: var(--text-muted);">DASHBOARD</span>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div class="stat-card animated-border-slow">
+              <div class="text-xs uppercase tracking-wider mb-2" style="color: var(--text-muted);">Total</div>
+              <div class="text-2xl font-bold">${s.total}</div>
+              <div class="text-xs mt-1" style="color: var(--text-secondary);">jogos</div>
+            </div>
+            <div class="stat-card">
+              <div class="text-xs uppercase tracking-wider mb-2" style="color: var(--neon-blue);">Jogando</div>
+              <div class="text-2xl font-bold">${s.playing}</div>
+              <div class="text-xs mt-1" style="color: var(--text-secondary);">ativos</div>
+            </div>
+            <div class="stat-card">
+              <div class="text-xs uppercase tracking-wider mb-2" style="color: var(--neon-green);">Completos</div>
+              <div class="text-2xl font-bold">${s.completed}</div>
+              <div class="text-xs mt-1" style="color: var(--text-secondary);">zerados</div>
+            </div>
+            <div class="stat-card animated-border-slow">
+              <div class="text-xs uppercase tracking-wider mb-2" style="color: var(--neon-red);">Progresso</div>
+              <div class="text-2xl font-bold">${s.pct}<span class="text-sm">%</span></div>
+              <div class="progress-bar mt-2">
+                <div class="progress-fill" style="width: ${s.pct}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hours Section -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            <div class="stat-card">
+              <div class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">Horas Restantes</div>
+              <div class="text-xl font-bold">~${s.hoursRemaining}<span class="text-xs font-normal">h</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">Horas Completas</div>
+              <div class="text-xl font-bold">~${s.hoursCompleted}<span class="text-xs font-normal">h</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">Estimativa / Semana</div>
+              <div class="text-xl font-bold">~${s.hoursRemaining > 0 ? Math.round(s.hoursRemaining / 12) : 0}<span class="text-xs font-normal">h</span></div>
+              <div class="text-xs" style="color: var(--text-secondary);">${s.hoursRemaining > 0 ? Math.ceil(s.hoursRemaining / 10) + " semanas" : "--"}</div>
+            </div>
+          </div>
+
+          <!-- Platforms -->
+          ${
+            platforms.length > 0
+              ? `
+          <div class="mb-6">
+            <h2 class="text-xs uppercase tracking-widest mb-4" style="color: var(--text-muted);">Jogos por Plataforma</h2>
+            <div class="space-y-2">
+              ${platforms
+                .map(
+                  ([name, count]) => `
+                <div class="flex items-center gap-3">
+                  <span class="text-xs w-24 truncate" style="color: var(--text-secondary);">${name}</span>
+                  <div class="flex-1 h-1.5" style="background: rgba(255,255,255,0.05);">
+                    <div class="h-full" style="width: ${(count / maxPlatCount) * 100}%; background: var(--neon-red); box-shadow: 0 0 6px rgba(255,0,64,0.4);"></div>
+                  </div>
+                  <span class="text-xs font-bold w-6 text-right">${count}</span>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          </div>
+          `
+              : ""
+          }
+
+          <!-- Recent Games -->
+          <div>
+            <h2 class="text-xs uppercase tracking-widest mb-4" style="color: var(--text-muted);">Jogos Recentes</h2>
+            ${
+              recentGames.length > 0
+                ? `
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 game-grid-container">
+                ${recentGames.map(renderGameCard).join("")}
+              </div>
+            `
+                : `
+              <p class="terminal-text text-sm" style="color: var(--text-muted);">> SEM JOGOS ADICIONADOS</p>
+            `
+            }
+          </div>
+        </section>
+      `;
+      }
+
+      // ---- BACKLOG ----
+      function renderBacklog() {
+        const tabs = [
+          { key: "all", label: "Todos", count: state.games.length },
+          {
+            key: "playing",
+            label: "Jogando",
+            count: state.games.filter((g) => g.status === "playing").length,
+          },
+          {
+            key: "backlog",
+            label: "Backlog",
+            count: state.games.filter((g) => g.status === "backlog").length,
+          },
+          {
+            key: "completed",
+            label: "Completos",
+            count: state.games.filter((g) => g.status === "completed").length,
+          },
+          {
+            key: "dropped",
+            label: "Dropados",
+            count: state.games.filter((g) => g.status === "dropped").length,
+          },
+          {
+            key: "on_hold",
+            label: "Em Espera",
+            count: state.games.filter((g) => g.status === "on_hold").length,
+          },
+        ];
+
+        let filtered =
+          state.activeTab === "all"
+            ? [...state.games]
+            : state.games.filter((g) => g.status === state.activeTab);
+
+        // Apply filters
+        if (state.filterPlatform) {
+          filtered = filtered.filter((g) =>
+            (g.platforms || []).includes(state.filterPlatform),
+          );
+        }
+        if (state.filterGenre) {
+          filtered = filtered.filter((g) =>
+            (g.genres || []).includes(state.filterGenre),
+          );
+        }
+
+        // Sort
+        filtered.sort((a, b) => {
+          switch (state.sortBy) {
+            case "name":
+              return a.name.localeCompare(b.name);
+            case "rating":
+              return (b.rating || 0) - (a.rating || 0);
+            case "hours":
+              return (b.estimated_hours || 0) - (a.estimated_hours || 0);
+            default:
+              return new Date(b.added_at) - new Date(a.added_at);
+          }
+        });
+
+        // Get unique platforms/genres for filters
+        const allPlatforms = [
+          ...new Set(state.games.flatMap((g) => g.platforms || [])),
+        ].sort();
+        const allGenres = [
+          ...new Set(state.games.flatMap((g) => g.genres || [])),
+        ].sort();
+
+        return `
+        <section class="page-section">
+          <div class="flex items-center gap-3 mb-6">
+            <h1 class="text-lg tracking-widest uppercase" style="color: var(--text-primary);">BACKLOG</h1>
+            <div class="flex-1 h-px" style="background: var(--border-color);"></div>
+            <span class="text-xs" style="color: var(--text-muted);">${state.games.length} JOGOS</span>
+          </div>
+
+          <!-- Tabs -->
+          <div class="flex gap-2 mb-4 overflow-x-auto pb-2" style="-webkit-overflow-scrolling: touch;">
+            ${tabs
+              .map(
+                (t) => `
+              <button class="tab-btn ${state.activeTab === t.key ? "active" : ""}"
+                      onclick="state.activeTab='${t.key}'; playTabClick(); renderPage();">
+                ${t.label} <span style="opacity:0.5">${t.count}</span>
+              </button>
+            `,
+              )
+              .join("")}
+          </div>
+
+          <!-- Filters -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            <select class="cyber-select" onchange="state.sortBy=this.value; renderPage();">
+              <option value="added_at" ${state.sortBy === "added_at" ? "selected" : ""}>Recentes</option>
+              <option value="name" ${state.sortBy === "name" ? "selected" : ""}>Nome</option>
+              <option value="rating" ${state.sortBy === "rating" ? "selected" : ""}>Avaliação</option>
+              <option value="hours" ${state.sortBy === "hours" ? "selected" : ""}>Horas</option>
+            </select>
+            <select class="cyber-select" onchange="state.filterPlatform=this.value; renderPage();">
+              <option value="">Plataforma</option>
+              ${allPlatforms.map((p) => `<option value="${p}" ${state.filterPlatform === p ? "selected" : ""}>${p}</option>`).join("")}
+            </select>
+            <select class="cyber-select" onchange="state.filterGenre=this.value; renderPage();">
+              <option value="">Gênero</option>
+              ${allGenres.map((g) => `<option value="${g}" ${state.filterGenre === g ? "selected" : ""}>${g}</option>`).join("")}
+            </select>
+          </div>
+
+          <!-- Game Grid -->
+          ${
+            filtered.length > 0
+              ? `
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 game-grid-container">
+              ${filtered.map(renderGameCard).join("")}
+            </div>
+          `
+              : `
+            <div class="flex items-center justify-center py-20">
+              <p class="terminal-text text-sm" style="color: var(--text-muted);">> NENHUM JOGO ENCONTRADO</p>
+            </div>
+          `
+          }
+        </section>
+      `;
+      }
+
+      // ---- SEARCH ----
+      function renderSearch() {
+        return `
+        <section class="page-section">
+          <div class="flex items-center gap-3 mb-6">
+            <h1 class="text-lg tracking-widest uppercase" style="color: var(--text-primary);">BUSCAR JOGOS</h1>
+            <div class="flex-1 h-px" style="background: var(--border-color);"></div>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="flex gap-2 mb-6">
+            <input
+              id="search-input"
+              type="text"
+              class="search-input flex-1"
+              placeholder="> digite o nome do jogo..."
+              value="${state.searchQuery}"
+              onkeydown="if(event.key==='Enter'){searchGames(this.value)}"
+            />
+            <button
+              class="px-4 border font-mono text-xs uppercase tracking-wider cursor-pointer transition-all hover:bg-white/5"
+              style="background: none; border-color: var(--neon-red); color: var(--neon-red);"
+              onclick="searchGames(document.getElementById('search-input').value)"
+            >Buscar</button>
+          </div>
+
+          <!-- Results -->
+          <div id="search-results">
+            ${
+              state.searchLoading
+                ? `
+              <div class="flex items-center justify-center py-20">
+                <p class="loading-pulse text-sm uppercase tracking-wider" style="color: var(--neon-red);">Carregando dados...</p>
+              </div>
+            `
+                : state.searchResults.length > 0
+                  ? `
+              <div class="text-xs uppercase tracking-wider mb-4" style="color: var(--text-muted);">
+                ${state.searchResults.length} resultados para "${state.searchQuery}"
+              </div>
+              <div class="space-y-2">
+                ${state.searchResults.map(renderSearchResult).join("")}
+              </div>
+            `
+                  : state.searchQuery
+                    ? `
+              <div class="flex items-center justify-center py-20">
+                <p class="terminal-text text-sm" style="color: var(--text-muted);">> NENHUM RESULTADO ENCONTRADO</p>
+              </div>
+            `
+                    : `
+              <div class="flex items-center justify-center py-20">
+                <p class="terminal-text text-sm" style="color: var(--text-muted);">> BUSQUE UM JOGO PARA COMEÇAR</p>
+              </div>
+            `
+            }
+          </div>
+        </section>
+      `;
+      }
+
+      // ---- PROFILE ----
+      function renderProfile() {
+        return `
+        <section class="page-section">
+          <div class="flex items-center gap-3 mb-6">
+            <h1 class="text-lg tracking-widest uppercase" style="color: var(--text-primary);">PERFIL</h1>
+            <div class="flex-1 h-px" style="background: var(--border-color);"></div>
+          </div>
+
+          <div class="max-w-md">
+            <div class="stat-card animated-border-slow mb-4">
+              <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 flex items-center justify-center text-2xl" style="border: 1px dashed var(--border-hover); color: var(--text-muted);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="32" height="32"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+                </div>
+                <div>
+                  <div class="text-sm font-bold">USUÁRIO</div>
+                  <div class="text-xs" style="color: var(--text-secondary);">usuario@email.com</div>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <div>
+                  <label class="text-xs uppercase tracking-wider block mb-1" style="color: var(--text-muted);">Username</label>
+                  <input type="text" class="search-input" value="gamer_001" />
+                </div>
+                <div>
+                  <label class="text-xs uppercase tracking-wider block mb-1" style="color: var(--text-muted);">Nome</label>
+                  <input type="text" class="search-input" value="Jogador" />
+                </div>
+                <div>
+                  <label class="text-xs uppercase tracking-wider block mb-1" style="color: var(--text-muted);">Bio</label>
+                  <textarea class="search-input" rows="3" style="resize: none;">Meu backlog é infinito.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-3 gap-3">
+              <div class="stat-card text-center">
+                <div class="text-lg font-bold">${state.games.length}</div>
+                <div class="text-xs" style="color: var(--text-muted);">Jogos</div>
+              </div>
+              <div class="stat-card text-center">
+                <div class="text-lg font-bold">${state.games.filter((g) => g.status === "completed").length}</div>
+                <div class="text-xs" style="color: var(--text-muted);">Zerados</div>
+              </div>
+              <div class="stat-card text-center">
+                <div class="text-lg font-bold">${getStats().pct}%</div>
+                <div class="text-xs" style="color: var(--text-muted);">Progresso</div>
+              </div>
+            </div>
+
+            <!-- CRT Toggle (mobile) -->
+            <button id="crt-toggle-profile" class="w-full mt-4 py-2 text-xs uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-2 md:hidden"
+                    style="background: none; border: 1px solid var(--border-color); color: var(--text-secondary);"
+                    onclick="toggleCRT()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                <rect x="2" y="3" width="20" height="14" rx="1" />
+                <path d="M8 21h8M12 17v4" />
+                <path d="M5 7h14" stroke-dasharray="2 2" opacity="0.5" />
+                <path d="M5 10h14" stroke-dasharray="2 2" opacity="0.5" />
+                <path d="M5 13h14" stroke-dasharray="2 2" opacity="0.5" />
+              </svg>
+              <span id="crt-label-profile">CRT: LIGADO</span>
+            </button>
+
+            <button class="w-full mt-2 py-2 text-xs uppercase tracking-wider cursor-pointer transition-all hover:bg-red-900/20"
+                    style="background: none; border: 1px solid rgba(255,0,64,0.3); color: var(--neon-red);"
+                    onclick="playClick()">
+              Sair
+            </button>
+          </div>
+        </section>
+      `;
+      }
+
+      // ============================================================
+      // RENDER COMPONENTS
+      // ============================================================
+      function renderGameCard(game) {
+        return `
+        <div class="game-card status-${game.status}" onclick="openModal(${game.id})" data-id="${game.id}">
+          <div class="cover-frame" style="aspect-ratio: 3/4; position: relative;">
+            ${
+              game.cover
+                ? `<img src="${game.cover}" alt="${game.name}" loading="lazy" />`
+                : `<div class="flex items-center justify-center h-full" style="color: var(--text-muted); font-size: 10px;">SEM CAPA</div>`
+            }
+            <!-- Hover overlay -->
+            <div class="card-overlay">
+              <div class="text-xs mb-1" style="color: var(--text-secondary);">${(game.genres || []).slice(0, 2).join(", ")}</div>
+              <div class="text-xs" style="color: var(--text-secondary);">${(game.platforms || []).slice(0, 3).join(", ")}</div>
+              ${game.released ? `<div class="text-xs mt-1" style="color: var(--text-muted);">${game.released.substring(0, 4)}</div>` : ""}
+              <div class="text-xs mt-1" style="color: var(--text-secondary);">~${game.estimated_hours}h</div>
+            </div>
+          </div>
+          <div class="p-2">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="status-dot dot-${game.status}"></span>
+              <span class="text-xs" style="color: ${STATUS_COLORS[game.status]};">${STATUS_LABELS[game.status]}</span>
+            </div>
+            <h3 class="text-xs font-medium truncate" title="${game.name}">${game.name}</h3>
+            ${game.rating > 0 ? `<div class="mt-1" style="font-size: 10px; color: var(--neon-amber);">${"★".repeat(game.rating)}${"☆".repeat(5 - game.rating)}</div>` : ""}
+          </div>
+        </div>
+      `;
+      }
+
+      function renderSearchResult(game) {
+        const alreadyAdded = state.games.some((g) => g.id === game.id);
+        return `
+        <div class="search-result scan-hover flex items-center gap-3 p-3 cursor-pointer transition-all hover:bg-white/[0.02]"
+             style="border: 1px solid var(--border-color);"
+             onclick="openSearchDetail(${game.id})">
+          <div class="cover-frame flex-shrink-0" style="width: 48px; height: 64px;">
+            ${
+              game.background_image
+                ? `<img src="${game.background_image}" alt="${game.name}" loading="lazy" />`
+                : `<div class="flex items-center justify-center h-full" style="color: var(--text-muted); font-size: 8px;">?</div>`
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-medium truncate">${game.name}</h3>
+            <p class="text-xs truncate" style="color: var(--text-secondary);">
+              ${game.released ? game.released.substring(0, 4) : "?"}
+              ${
+                (game.genres || []).length > 0
+                  ? " · " +
+                    game.genres
+                      .slice(0, 2)
+                      .map((g) => g.name)
+                      .join(", ")
+                  : ""
+              }
+            </p>
+            <p class="text-xs truncate" style="color: var(--text-muted);">
+              ${(game.platforms || [])
+                .slice(0, 4)
+                .map((p) => p.platform.name)
+                .join(", ")}
+            </p>
+          </div>
+          ${
+            alreadyAdded
+              ? `<span class="text-xs uppercase tracking-wider px-2 py-1 flex-shrink-0" style="color: var(--text-muted); border: 1px solid var(--border-color);">Adicionado</span>`
+              : `<button class="add-btn flex-shrink-0" onclick="event.stopPropagation(); addGame(state.searchResults.find(g=>g.id===${game.id}))">+</button>`
+          }
+        </div>
+      `;
+      }
+
+      // ============================================================
+      // MODAL
+      // ============================================================
+      async function openModal(gameId) {
+        const game = state.games.find((g) => g.id === gameId);
+        if (!game) return;
+        playClick();
+        renderModal(game);
+        document.getElementById("modal-overlay").style.display = "flex";
+        document.body.style.overflow = "hidden";
+
+        // Fetch description if missing
+        if (!game.description) {
+          const details = await fetchGameDetails(gameId);
+          if (details && details.description_raw) {
+            game.description = details.description_raw;
+            saveGames();
+            renderModal(game);
+          }
+        }
+      }
+
+      async function openSearchDetail(gameId) {
+        const game = state.searchResults.find((g) => g.id === gameId);
+        if (!game) return;
+        playClick();
+
+        const alreadyAdded = state.games.some((g) => g.id === game.id);
+        const estimated = Math.floor(Math.random() * 60) + 15;
+
+        function renderSearchModal(desc) {
+          const hasDesc = typeof desc === "string" && desc.length > 0;
+          const isLoading = typeof desc === "undefined";
+          const needsTruncate = hasDesc && desc.length > 300;
+          const safeDesc = hasDesc ? desc.replace(/</g, '&lt;') : "";
+          const shortDesc = needsTruncate ? desc.substring(0, 300).replace(/</g, '&lt;') + "..." : safeDesc;
+
+          document.getElementById("modal").innerHTML = `
+          <div class="p-4 md:p-6">
+            <button class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white cursor-pointer bg-transparent border-none"
+                    onclick="closeModal()" style="font-family: inherit;">✕</button>
+
+            <div class="flex flex-col sm:flex-row gap-4 mb-4">
+              <div class="cover-frame flex-shrink-0" style="width: 140px; height: 187px;">
+                ${
+                  game.background_image
+                    ? `<img src="${game.background_image}" alt="${game.name}" />`
+                    : `<div class="flex items-center justify-center h-full" style="color: var(--text-muted);">?</div>`
+                }
+              </div>
+              <div>
+                <h2 class="text-lg font-bold mb-2">${game.name}</h2>
+                <div class="space-y-1 text-xs" style="color: var(--text-secondary);">
+                  ${game.released ? `<p>Lançamento: ${game.released}</p>` : ""}
+                  <p>Gêneros: ${(game.genres || []).map((g) => g.name).join(", ") || "?"}</p>
+                  <p>Plataformas: ${(game.platforms || []).map((p) => p.platform.name).join(", ") || "?"}</p>
+                  <p>Horas estimadas: ~${estimated}h</p>
+                  ${game.rating ? `<p>Rating RAWG: ${game.rating}/5</p>` : ""}
+                </div>
+              </div>
+            </div>
+
+            ${hasDesc ? `
+            <div class="mb-4">
+              <label class="text-xs uppercase tracking-wider block mb-2" style="color: var(--text-muted);">Descrição</label>
+              <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" id="search-desc-text">${shortDesc}</p>
+              ${needsTruncate ? `
+              <button onclick="expandSearchDesc(this)"
+                      class="text-xs mt-1 cursor-pointer bg-transparent border-none"
+                      style="color: var(--neon-red); font-family: inherit; padding: 0; text-transform: uppercase; letter-spacing: 1px;">
+                Mostrar mais
+              </button>` : ''}
+            </div>
+            ` : (isLoading ? `
+            <div class="mb-4">
+              <p class="loading-pulse text-xs uppercase tracking-wider" style="color: var(--text-muted);">Carregando descrição...</p>
+            </div>
+            ` : '')}
+
+            ${
+              alreadyAdded
+                ? `<div class="text-xs uppercase tracking-wider text-center py-3" style="border: 1px solid var(--border-color); color: var(--text-muted);">Já está no backlog</div>`
+                : `<button class="w-full py-3 text-xs uppercase tracking-wider font-bold cursor-pointer transition-all"
+                        style="background: var(--neon-green); color: #000; border: none; font-family: inherit;"
+                        onclick="addGame(state.searchResults.find(g=>g.id===${game.id})); closeModal();">
+                  + Adicionar ao Backlog
+                </button>`
+            }
+          </div>
+        `;
+        }
+
+        // Store full desc for expand button
+        window._searchDescFull = "";
+
+        // Show modal immediately with loading state
+        renderSearchModal(undefined);
+        document.getElementById("modal-overlay").style.display = "flex";
+        document.body.style.overflow = "hidden";
+
+        // Fetch full details
+        const details = await fetchGameDetails(gameId);
+        const description = details?.description_raw || "";
+        game._cachedDescription = description;
+        window._searchDescFull = description;
+        renderSearchModal(description);
+      }
+
+      function renderModal(game) {
+        const statusOptions = Object.entries(STATUS_LABELS)
+          .map(
+            ([key, label]) =>
+              `<option value="${key}" ${game.status === key ? "selected" : ""}>${label}</option>`,
+          )
+          .join("");
+
+        document.getElementById("modal").innerHTML = `
+        <div class="p-4 md:p-6">
+          <button class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white cursor-pointer bg-transparent border-none"
+                  onclick="closeModal()" style="font-family: inherit;">✕</button>
+
+          <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <div class="cover-frame flex-shrink-0" style="width: 140px; height: 187px;">
+              ${
+                game.cover
+                  ? `<img src="${game.cover}" alt="${game.name}" />`
+                  : `<div class="flex items-center justify-center h-full" style="color: var(--text-muted);">?</div>`
+              }
+            </div>
+            <div class="flex-1">
+              <h2 class="text-lg font-bold mb-2">${game.name}</h2>
+              <div class="space-y-1 text-xs" style="color: var(--text-secondary);">
+                ${game.released ? `<p>Lançamento: ${game.released}</p>` : ""}
+                <p>Gêneros: ${(game.genres || []).join(", ") || "?"}</p>
+                <p>Plataformas: ${(game.platforms || []).join(", ") || "?"}</p>
+                <p>Horas estimadas: ~${game.estimated_hours}h</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          ${game.description ? `
+          <div class="mb-4">
+            <label class="text-xs uppercase tracking-wider block mb-2" style="color: var(--text-muted);">Descrição</label>
+            ${game.description.length > 300 ? `
+              <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" id="desc-text-${game.id}">${game.description.substring(0, 300).replace(/</g, '&lt;')}...</p>
+              <button onclick="document.getElementById('desc-text-${game.id}').textContent=state.games.find(g=>g.id===${game.id}).description; this.remove();"
+                      class="text-xs mt-1 cursor-pointer bg-transparent border-none"
+                      style="color: var(--neon-red); font-family: inherit; padding: 0; text-transform: uppercase; letter-spacing: 1px;">
+                Mostrar mais
+              </button>
+            ` : `
+              <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">${game.description.replace(/</g, '&lt;')}</p>
+            `}
+          </div>
+          ` : `
+          <div class="mb-4" id="desc-loading-${game.id}">
+            <p class="loading-pulse text-xs uppercase tracking-wider" style="color: var(--text-muted);">Carregando descrição...</p>
+          </div>
+          `}
+
+          <!-- Status -->
+          <div class="mb-4">
+            <label class="text-xs uppercase tracking-wider block mb-2" style="color: var(--text-muted);">Status</label>
+            <select class="cyber-select w-full" onchange="updateGameStatus(${game.id}, this.value)">
+              ${statusOptions}
+            </select>
+          </div>
+
+          <!-- Rating -->
+          <div class="mb-4">
+            <label class="text-xs uppercase tracking-wider block mb-2" style="color: var(--text-muted);">Avaliação</label>
+            ${renderStars(game.rating || 0, true, game.id)}
+          </div>
+
+          <!-- Notes -->
+          <div class="mb-4">
+            <label class="text-xs uppercase tracking-wider block mb-2" style="color: var(--text-muted);">Notas</label>
+            <textarea
+              class="search-input w-full"
+              rows="3"
+              style="resize: none;"
+              placeholder="> suas anotações..."
+              onchange="updateGameNotes(${game.id}, this.value)"
+            >${game.notes || ""}</textarea>
+          </div>
+
+          <!-- Remove Button -->
+          <button class="w-full py-2 text-xs uppercase tracking-wider cursor-pointer transition-all hover:bg-red-900/20"
+                  style="background: none; border: 1px solid rgba(255,0,64,0.3); color: var(--neon-red); font-family: inherit;"
+                  onclick="removeGame(${game.id})">
+            Remover do Backlog
+          </button>
+        </div>
+      `;
+      }
+
+      function expandSearchDesc(btn) {
+        const el = document.getElementById("search-desc-text");
+        if (el && window._searchDescFull) {
+          el.textContent = window._searchDescFull;
+        }
+        btn.remove();
+      }
+
+      function closeModal() {
+        document.getElementById("modal-overlay").style.display = "none";
+        document.body.style.overflow = "";
+        playClick();
+        renderPage();
+      }
+
+      // ============================================================
+      // CONFIRM DIALOG
+      // ============================================================
+      let confirmCallback = null;
+
+      function showConfirm(title, message, onConfirm) {
+        confirmCallback = onConfirm;
+        const overlay = document.getElementById("confirm-overlay");
+        overlay.innerHTML = `
+        <div class="p-6 max-w-sm w-full" onclick="event.stopPropagation();"
+             style="background: var(--bg-surface); border: 1px solid var(--neon-red); box-shadow: 0 0 30px rgba(255,0,64,0.15);">
+          <p class="text-sm font-bold mb-2" style="color: var(--neon-red);">${title}</p>
+          <p class="text-xs mb-6" style="color: var(--text-secondary);">${message}</p>
+          <div class="flex gap-3">
+            <button class="flex-1 py-2 text-xs uppercase tracking-wider cursor-pointer font-mono"
+                    style="background: rgba(255,0,64,0.15); border: 1px solid var(--neon-red); color: var(--neon-red);"
+                    onclick="closeConfirm(true);">
+              [SIM]
+            </button>
+            <button class="flex-1 py-2 text-xs uppercase tracking-wider cursor-pointer font-mono"
+                    style="background: none; border: 1px solid var(--border-color); color: var(--text-secondary);"
+                    onclick="closeConfirm(false);">
+              [NÃO]
+            </button>
+          </div>
+        </div>
+      `;
+        overlay.style.display = "flex";
+        overlay.onclick = (e) => {
+          if (e.target === overlay) closeConfirm(false);
+        };
+      }
+
+      function closeConfirm(confirmed) {
+        document.getElementById("confirm-overlay").style.display = "none";
+        if (confirmed && confirmCallback) {
+          confirmCallback();
+        }
+        confirmCallback = null;
+        playClick();
+      }
+
+      // ============================================================
+      // SNACKBAR
+      // ============================================================
+      function showSnackbar(message, undoFn = null) {
+        const snackbar = document.getElementById("snackbar");
+        const textEl = document.getElementById("snackbar-text");
+        const undoBtn = document.getElementById("snackbar-undo");
+
+        textEl.textContent = message;
+
+        if (undoFn) {
+          undoBtn.style.display = "block";
+          undoBtn.onclick = () => {
+            undoFn();
+            hideSnackbar();
+            playClick();
+          };
+        } else {
+          undoBtn.style.display = "none";
+        }
+
+        snackbar.classList.add("show");
+        clearTimeout(snackbarTimeout);
+        snackbarTimeout = setTimeout(hideSnackbar, 5000);
+      }
+
+      function hideSnackbar() {
+        document.getElementById("snackbar").classList.remove("show");
+      }
+
+      // ============================================================
+      // CARD TILT (3D EFFECT)
+      // ============================================================
+      function setupCardTilt() {
+        document.querySelectorAll(".game-card").forEach((card) => {
+          card.onmousemove = (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = `perspective(800px) rotateX(${y * -8}deg) rotateY(${x * 8}deg) scale(1.03)`;
+          };
+          card.onmouseleave = () => {
+            card.style.transform = "";
+          };
+        });
+      }
+
+      // ============================================================
+      // SEARCH LISTENERS
+      // ============================================================
+      function setupSearchListeners() {
+        const input = document.getElementById("search-input");
+        if (input) {
+          input.focus();
+        }
+      }
+
+      // ============================================================
+      // CRT TOGGLE
+      // ============================================================
+      let crtEnabled = localStorage.getItem("ub_crt") !== "off";
+
+      function applyCRT() {
+        document.body.classList.toggle("crt-off", !crtEnabled);
+        // Update sidebar button style
+        const sidebarBtn = document.getElementById("crt-toggle-sidebar");
+        if (sidebarBtn) {
+          sidebarBtn.style.color = crtEnabled ? "var(--neon-green)" : "var(--text-muted)";
+        }
+        // Update profile label
+        const profileLabel = document.getElementById("crt-label-profile");
+        if (profileLabel) {
+          profileLabel.textContent = crtEnabled ? "CRT: LIGADO" : "CRT: DESLIGADO";
+        }
+        const profileBtn = document.getElementById("crt-toggle-profile");
+        if (profileBtn) {
+          profileBtn.style.color = crtEnabled ? "var(--neon-green)" : "var(--text-muted)";
+          profileBtn.style.borderColor = crtEnabled ? "var(--neon-green)" : "var(--border-color)";
+        }
+      }
+
+      function toggleCRT() {
+        crtEnabled = !crtEnabled;
+        localStorage.setItem("ub_crt", crtEnabled ? "on" : "off");
+        playClick();
+        applyCRT();
+      }
+
+      // ============================================================
+      // LOGO GLITCH SCRAMBLE
+      // ============================================================
+      function setupLogoGlitch() {
+        const glitchChars = "█▓░╬§¶×÷±≠∞∆◊";
+        document.querySelectorAll(".logo-glitch").forEach((el) => {
+          // Store original text of each text node
+          const textNodes = [];
+          function collectTextNodes(node) {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+              textNodes.push({ node, original: node.textContent });
+            } else {
+              node.childNodes.forEach(collectTextNodes);
+            }
+          }
+          collectTextNodes(el);
+
+          let isAnimating = false;
+
+          el.addEventListener("mouseenter", () => {
+            if (isAnimating || textNodes.length === 0) return;
+            isAnimating = true;
+            let iterations = 0;
+            const maxIterations = 8;
+
+            const interval = setInterval(() => {
+              textNodes.forEach(({ node, original }) => {
+                const text = original.split("");
+                for (let i = 0; i < text.length; i++) {
+                  if (text[i] !== " " && text[i] !== "\n" && Math.random() > iterations / maxIterations) {
+                    text[i] = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                  }
+                }
+                node.textContent = text.join("");
+              });
+
+              iterations++;
+              if (iterations >= maxIterations) {
+                clearInterval(interval);
+                textNodes.forEach(({ node, original }) => {
+                  node.textContent = original;
+                });
+                isAnimating = false;
+              }
+            }, 50);
+          });
+        });
+      }
+
+      // ============================================================
+      // MODAL CLICK OUTSIDE
+      // ============================================================
+      document
+        .getElementById("modal-overlay")
+        .addEventListener("click", (e) => {
+          if (e.target === document.getElementById("modal-overlay")) {
+            closeModal();
+          }
+        });
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      async function init() {
+        loadGames();
+        setupLogoGlitch();
+        applyCRT();
+
+        if (state.games.length === 0) {
+          // Show loading state
+          document.getElementById("page-content").innerHTML = `
+          <div class="flex flex-col items-center justify-center" style="min-height: 60vh;">
+            <h1 class="text-xl mb-4 tracking-widest logo-glitch" data-text="ULTIMATE BACKLOG" style="font-family: 'Deltha'; color: var(--neon-red);">ULTIMATE BACKLOG</h1>
+            <p class="loading-pulse text-xs uppercase tracking-wider" style="color: var(--text-muted);">Preparando dados...</p>
+          </div>
+        `;
+          await loadSampleGames();
+        }
+
+        renderPage();
+      }
+
+      init();
+    </script>
+  </body>
+</html>

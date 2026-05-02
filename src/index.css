@@ -1,0 +1,1066 @@
+@import "tailwindcss";
+
+/* ============================================================
+   FONTS
+   ============================================================ */
+@font-face {
+  font-family: "Deltha";
+  src: url("./assets/fonts/Deltha.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================================
+   TAILWIND V4 @theme — gera classes como bg-bg-base, text-neon-red, etc.
+   ============================================================ */
+@theme {
+  --color-bg-base: #0a0a0a;
+  --color-bg-surface: #111111;
+  --color-bg-elevated: #1a1a1a;
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #888888;
+  --color-text-muted: #555555;
+  --color-neon-red: #ff0040;
+  --color-neon-blue: #0ea5e9;
+  --color-neon-green: #22c55e;
+  --color-neon-amber: #f59e0b;
+  --color-neon-gray: #6b7280;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Deltha", sans-serif;
+}
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES (for use in vanilla CSS effects)
+   ============================================================ */
+:root {
+  --bg-base: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-elevated: #1a1a1a;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --text-primary: #e0e0e0;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+  --neon-red: #ff0040;
+  --neon-blue: #0ea5e9;
+  --neon-green: #22c55e;
+  --neon-amber: #f59e0b;
+  --neon-gray: #6b7280;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: "JetBrains Mono", monospace;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-red);
+}
+
+/* ============================================================
+   ANIMATED BORDER GLOW
+   ============================================================ */
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.animated-border {
+  --border-angle: 0deg;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
+    conic-gradient(
+        from var(--border-angle),
+        transparent 60%,
+        var(--neon-red),
+        transparent 80%
+      )
+      border-box;
+  animation: borderSpin 4s linear infinite;
+}
+
+.animated-border-slow {
+  --border-angle: 0deg;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
+    conic-gradient(
+        from var(--border-angle),
+        transparent 70%,
+        rgba(255, 0, 64, 0.5),
+        transparent 85%
+      )
+      border-box;
+  animation: borderSpin 8s linear infinite;
+}
+
+@keyframes borderSpin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* ============================================================
+   NEON GLOW
+   ============================================================ */
+.neon-glow {
+  box-shadow: 0 0 8px rgba(255, 0, 64, 0.3);
+}
+.neon-glow-strong {
+  box-shadow:
+    0 0 15px rgba(255, 0, 64, 0.5),
+    0 0 30px rgba(255, 0, 64, 0.2);
+}
+.neon-text {
+  text-shadow: 0 0 10px rgba(255, 0, 64, 0.5);
+}
+
+/* ============================================================
+   COVER FRAME (DASHED BORDER)
+   ============================================================ */
+.cover-frame {
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  position: relative;
+}
+.cover-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ============================================================
+   CARD TILT + TRAILING DOT
+   ============================================================ */
+.game-card {
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.3s;
+  will-change: transform;
+  cursor: pointer;
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+}
+.game-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.game-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+  padding: 2px;
+  --border-angle: 0deg;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 50%,
+    rgba(255, 255, 255, 0.05) 60%,
+    rgba(255, 255, 255, 0.3) 66%,
+    white 69%,
+    rgba(255, 255, 255, 0.3) 72%,
+    rgba(255, 255, 255, 0.05) 76%,
+    transparent 82%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: borderSpin 12s linear infinite;
+}
+.game-card:hover::before {
+  opacity: 1;
+}
+
+/* ============================================================
+   SIDEBAR (DESKTOP)
+   ============================================================ */
+#sidebar {
+  width: 60px;
+  min-height: 100vh;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 40;
+  overflow: hidden;
+}
+#sidebar:hover {
+  width: 200px;
+}
+#sidebar .nav-label {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+#sidebar:hover .nav-label {
+  opacity: 1;
+}
+#sidebar .logo-text {
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+#sidebar:hover .logo-text {
+  opacity: 1;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+.nav-item:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+.nav-item.active {
+  color: var(--neon-red);
+  border-right: 2px solid var(--neon-red);
+}
+.nav-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+#main {
+  margin-left: 60px;
+  padding: 8px 16px 2rem;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
+}
+#sidebar:hover ~ #main {
+  margin-left: 200px;
+}
+
+/* ============================================================
+   BOTTOM NAV (MOBILE)
+   ============================================================ */
+#bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  z-index: 50;
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+}
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 0;
+  flex: 1;
+  text-decoration: none;
+}
+.bottom-nav-item.active {
+  color: var(--neon-red);
+}
+.bottom-nav-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.tab-btn {
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.tab-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+.tab-btn.active {
+  border-color: var(--neon-red);
+  color: var(--neon-red);
+  box-shadow: 0 0 8px rgba(255, 0, 64, 0.2);
+}
+
+/* ============================================================
+   STATUS DOTS
+   ============================================================ */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-backlog .status-dot,
+.dot-backlog {
+  background: var(--neon-gray);
+}
+.status-playing .status-dot,
+.dot-playing {
+  background: var(--neon-blue);
+  box-shadow: 0 0 6px rgba(14, 165, 233, 0.5);
+  animation: statusPulse 2s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(14, 165, 233, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 10px rgba(14, 165, 233, 0.9),
+      0 0 18px rgba(14, 165, 233, 0.3);
+    transform: scale(1.5);
+  }
+}
+.status-completed .status-dot,
+.dot-completed {
+  background: var(--neon-green);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+}
+.status-dropped .status-dot,
+.dot-dropped {
+  background: var(--neon-red);
+  box-shadow: 0 0 6px rgba(255, 0, 64, 0.5);
+}
+.status-on_hold .status-dot,
+.dot-on_hold {
+  background: var(--neon-amber);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--neon-red);
+  box-shadow: 0 0 10px rgba(255, 0, 64, 0.6);
+  transition: width 0.5s ease;
+}
+
+/* ============================================================
+   TERMINAL CURSOR (EMPTY STATES)
+   ============================================================ */
+.terminal-text::after {
+  content: "\2588";
+  animation: blink 1s step-start infinite;
+  color: var(--neon-red);
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   STAR RATING
+   ============================================================ */
+.star-rating .star {
+  cursor: pointer;
+  color: #333;
+  font-size: 20px;
+  transition:
+    color 0.15s,
+    text-shadow 0.15s;
+}
+.star-rating .star.filled {
+  color: var(--neon-amber);
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+.star-rating .star:hover {
+  color: var(--neon-amber);
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+@media (min-width: 769px) {
+  .modal-content {
+    max-height: 70vh;
+  }
+}
+
+/* ============================================================
+   SNACKBAR
+   ============================================================ */
+.snackbar {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  padding: 12px 20px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+}
+.snackbar.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   CONFIRM MODAL
+   ============================================================ */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* ============================================================
+   SEARCH INPUT
+   ============================================================ */
+.search-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 10px 16px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus {
+  border-color: var(--neon-red);
+  box-shadow: 0 0 8px rgba(255, 0, 64, 0.15);
+}
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   CARD HOVER OVERLAY (INFO)
+   ============================================================ */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.95) 100%);
+  opacity: 0;
+  transition: opacity 0.25s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+}
+.game-card:hover .card-overlay {
+  opacity: 1;
+}
+
+/* ============================================================
+   SELECT DROPDOWN
+   ============================================================ */
+.cyber-select {
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 11px;
+  padding: 6px 28px 6px 10px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.cyber-select:focus {
+  border-color: var(--neon-red);
+}
+
+/* ============================================================
+   ADD BUTTON (SEARCH RESULTS)
+   ============================================================ */
+.add-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neon-green);
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.add-btn:hover {
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+  transform: scale(1.1);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  #sidebar {
+    display: none;
+  }
+  #main {
+    margin-left: 0 !important;
+  }
+  #bottom-nav {
+    display: flex;
+  }
+  .snackbar {
+    bottom: 80px;
+  }
+  .add-btn {
+    opacity: 1 !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .add-btn {
+    opacity: 0;
+    transition:
+      opacity 0.2s,
+      box-shadow 0.2s,
+      transform 0.2s;
+  }
+  .search-result:hover .add-btn {
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   PAGE TRANSITION (FADE IN)
+   ============================================================ */
+.page-section {
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   LOADING PULSE
+   ============================================================ */
+.loading-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   STAT CARD + SCAN HOVER
+   ============================================================ */
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  transition: border-color 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card:hover {
+  border-color: var(--border-hover);
+}
+.stat-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 0, 64, 0.3),
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 0, 64, 0.3),
+    transparent
+  );
+  box-shadow: 0 0 8px rgba(255, 0, 64, 0.2);
+  top: -1px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 5;
+  pointer-events: none;
+}
+.stat-card:hover::after {
+  opacity: 1;
+  animation: scanMove 1.8s ease-in-out infinite;
+}
+
+/* ============================================================
+   CRT MONITOR EFFECT
+   ============================================================ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 512px 512px;
+  animation: noiseShift 0.15s steps(3) infinite;
+}
+@keyframes noiseShift {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-1px, 1px);
+  }
+  66% {
+    transform: translate(1px, -1px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.35) 3px,
+    rgba(0, 0, 0, 0.35) 5px
+  );
+}
+
+#crt-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+}
+
+@keyframes crtFlicker {
+  0% {
+    opacity: 0.97;
+  }
+  5% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.98;
+  }
+  15% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  97% {
+    opacity: 0.96;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+body {
+  animation: crtFlicker 4s infinite;
+}
+
+body.crt-off {
+  animation: none;
+}
+body.crt-off::before,
+body.crt-off::after {
+  display: none;
+}
+body.crt-off #crt-vignette {
+  display: none;
+}
+
+/* ============================================================
+   SCAN LINE HOVER EFFECT
+   ============================================================ */
+.scan-hover {
+  position: relative;
+  overflow: hidden;
+}
+.scan-hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 0, 64, 0.4),
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 0, 64, 0.4),
+    transparent
+  );
+  box-shadow: 0 0 12px rgba(255, 0, 64, 0.3);
+  top: -2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 5;
+  pointer-events: none;
+}
+.scan-hover:hover::after {
+  opacity: 1;
+  animation: scanMove 1.8s ease-in-out infinite;
+}
+@keyframes scanMove {
+  0% {
+    top: -2px;
+  }
+  100% {
+    top: calc(100% + 2px);
+  }
+}
+
+/* ============================================================
+   LOGO GLITCH EFFECT
+   ============================================================ */
+.logo-glitch {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+.logo-glitch:hover {
+  animation: logoGlitch 0.3s steps(2) 3;
+}
+.logo-glitch::before,
+.logo-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.logo-glitch:hover::before {
+  opacity: 0.8;
+  color: #0ff;
+  animation: glitchClip1 0.4s steps(2) infinite;
+  clip-path: inset(10% 0 60% 0);
+  transform: translateX(-3px);
+}
+.logo-glitch:hover::after {
+  opacity: 0.8;
+  color: var(--neon-red);
+  animation: glitchClip2 0.4s steps(2) infinite reverse;
+  clip-path: inset(50% 0 10% 0);
+  transform: translateX(3px);
+}
+@keyframes logoGlitch {
+  0% {
+    transform: translate(0);
+  }
+  25% {
+    transform: translate(-2px, 1px);
+  }
+  50% {
+    transform: translate(2px, -1px);
+  }
+  75% {
+    transform: translate(-1px, -1px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+@keyframes glitchClip1 {
+  0% {
+    clip-path: inset(15% 0 60% 0);
+    transform: translateX(-3px);
+  }
+  33% {
+    clip-path: inset(50% 0 10% 0);
+    transform: translateX(2px);
+  }
+  66% {
+    clip-path: inset(20% 0 40% 0);
+    transform: translateX(-2px);
+  }
+  100% {
+    clip-path: inset(10% 0 55% 0);
+    transform: translateX(3px);
+  }
+}
+@keyframes glitchClip2 {
+  0% {
+    clip-path: inset(60% 0 5% 0);
+    transform: translateX(3px);
+  }
+  33% {
+    clip-path: inset(5% 0 50% 0);
+    transform: translateX(-3px);
+  }
+  66% {
+    clip-path: inset(40% 0 20% 0);
+    transform: translateX(2px);
+  }
+  100% {
+    clip-path: inset(55% 0 15% 0);
+    transform: translateX(-2px);
+  }
+}
+
+/* ============================================================
+   BOOT-UP EFFECT (PAGE TRANSITION)
+   ============================================================ */
+.boot-up > * {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: bootIn 0.4s ease forwards;
+}
+.boot-up > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.boot-up > *:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.boot-up > *:nth-child(3) {
+  animation-delay: 0.19s;
+}
+.boot-up > *:nth-child(4) {
+  animation-delay: 0.26s;
+}
+.boot-up > *:nth-child(5) {
+  animation-delay: 0.33s;
+}
+.boot-up > *:nth-child(6) {
+  animation-delay: 0.4s;
+}
+.boot-up > *:nth-child(7) {
+  animation-delay: 0.47s;
+}
+.boot-up > *:nth-child(8) {
+  animation-delay: 0.54s;
+}
+@keyframes bootIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   PAGE GLITCH TRANSITION (RGB SPLIT)
+   ============================================================ */
+.page-glitch {
+  animation: pageGlitch 0.25s steps(4) 1;
+}
+@keyframes pageGlitch {
+  0% {
+    filter: none;
+    transform: translate(0);
+  }
+  10% {
+    filter: none;
+    transform: translate(-3px, 0);
+  }
+  20% {
+    filter: hue-rotate(90deg) saturate(3);
+    transform: translate(2px, 1px);
+  }
+  30% {
+    filter: none;
+    transform: translate(0, -1px);
+  }
+  40% {
+    filter: hue-rotate(-90deg) saturate(2);
+    transform: translate(1px, 0);
+  }
+  50% {
+    filter: none;
+    transform: translate(-1px, 1px);
+  }
+  60% {
+    filter: hue-rotate(180deg);
+    transform: translate(2px, 0);
+  }
+  70% {
+    filter: none;
+    transform: translate(0);
+  }
+  100% {
+    filter: none;
+    transform: translate(0);
+  }
+}
+
+/* ============================================================
+   STATUS CHANGE FLASH
+   ============================================================ */
+@keyframes statusFlash {
+  0% {
+    box-shadow: inset 0 0 0 rgba(255, 255, 255, 0);
+  }
+  30% {
+    box-shadow: inset 0 0 40px var(--flash-color);
+  }
+  100% {
+    box-shadow: inset 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+.status-flash {
+  animation: statusFlash 0.5s ease-out 1;
+}
+
+/* ============================================================
+   BOOT-UP SCREEN (TERMINAL OVERLAY)
+   ============================================================ */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", monospace;
+}
+.boot-screen .boot-line {
+  opacity: 0;
+  animation: bootIn 0.3s ease forwards;
+}

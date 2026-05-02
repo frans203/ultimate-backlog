@@ -10,9 +10,10 @@ interface SearchDetailModalProps {
   onClose: () => void
   onAdd: (description: string) => void
   alreadyAdded: boolean
+  isAdding?: boolean
 }
 
-export function SearchDetailModal({ game, isOpen, onClose, onAdd, alreadyAdded }: SearchDetailModalProps) {
+export function SearchDetailModal({ game, isOpen, onClose, onAdd, alreadyAdded, isAdding }: SearchDetailModalProps) {
   const [expanded, setExpanded] = useState(false)
   const { data: details, isLoading } = useQuery({
     ...rawgQueries.details(game?.id || 0),
@@ -90,12 +91,14 @@ export function SearchDetailModal({ game, isOpen, onClose, onAdd, alreadyAdded }
           <Button
             variant="green"
             className="w-full py-3"
-            onClick={() => {
-              onAdd(details?.description_raw || '')
-              onClose()
-            }}
+            disabled={isAdding}
+            onClick={() => onAdd(details?.description_raw || '')}
           >
-            + Adicionar ao Backlog
+            {isAdding ? (
+              <span className="loading-pulse">Adicionando...</span>
+            ) : (
+              '+ Adicionar ao Backlog'
+            )}
           </Button>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Modal, StarRating, Badge, CoverFrame, Button } from '@/shared/components/ui'
+import { Modal, StarRating, CoverFrame, Button, Dropdown } from '@/shared/components/ui'
 import { ConfirmDialog } from '@/shared/components/ui'
 import { STATUS_LABELS } from '@/shared/constants'
 import { useUpdateStatus, useUpdateRating, useUpdateNotes, useUpdateHours, useRemoveGame } from '../api/game-mutations'
@@ -90,24 +90,22 @@ export function GameDetailModal({ game, isOpen, onClose }: GameDetailModalProps)
           )}
 
           <div className="mb-4">
-            <label className="text-xs uppercase tracking-wider block mb-2 text-text-muted">
-              Status
-            </label>
-            <select
-              className="cyber-select w-full"
+            <Dropdown
+              label="Status"
+              className="w-full"
               value={game.status}
-              onChange={(e) =>
+              onChange={(value) =>
                 updateStatus.mutate({
                   id: game.id,
-                  status: e.target.value as BacklogStatus,
+                  status: value as BacklogStatus,
                   oldStatus: game.status,
                 })
               }
-            >
-              {Object.entries(STATUS_LABELS).map(([key, label]) => (
-                <option key={key} value={key}>{label}</option>
-              ))}
-            </select>
+              options={Object.entries(STATUS_LABELS).map(([key, label]) => ({
+                value: key,
+                label,
+              }))}
+            />
           </div>
 
           <div className="mb-4">

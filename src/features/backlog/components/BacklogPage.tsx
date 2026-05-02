@@ -9,18 +9,22 @@ import { GameFilters } from './GameFilters'
 import { GameGrid } from './GameGrid'
 import { GameDetailModal } from './GameDetailModal'
 import { useBootUp } from '@/shared/hooks/use-boot-up'
-import type { Game } from '@/shared/types/database.types'
 
 export function BacklogPage() {
   const { user } = useAuth()
   const { data: games, isLoading } = useQuery(gameQueries.all(user!.id))
-  const [selectedGame, setSelectedGame] = useState<Game | null>(null)
+  const [selectedGameId, setSelectedGameId] = useState<string | null>(null)
   const bootRef = useBootUp()
 
   const activeTab = useStore((s) => s.activeTab)
   const sortBy = useStore((s) => s.sortBy)
   const filterPlatform = useStore((s) => s.filterPlatform)
   const filterGenre = useStore((s) => s.filterGenre)
+
+  const selectedGame = useMemo(
+    () => games?.find((g) => g.id === selectedGameId) ?? null,
+    [games, selectedGameId],
+  )
 
   const filtered = useMemo(() => {
     if (!games) return []
@@ -52,14 +56,14 @@ export function BacklogPage() {
       <PageHeader title="BACKLOG" subtitle={`${games?.length || 0} JOGOS`} />
       <GameFilters games={games || []} />
       {filtered.length > 0 ? (
-        <GameGrid games={filtered} onGameClick={setSelectedGame} />
+        <GameGrid games={filtered} onGameClick={(game) => setSelectedGameId(game.id)} />
       ) : (
         <EmptyState message="> NENHUM JOGO ENCONTRADO" />
       )}
       <GameDetailModal
         game={selectedGame}
         isOpen={!!selectedGame}
-        onClose={() => setSelectedGame(null)}
+        onClose={() => setSelectedGameId(null)}
       />
     </section>
   )

@@ -6,9 +6,10 @@ interface SearchResultProps {
   alreadyAdded: boolean
   onAdd: () => void
   onClick: () => void
+  isAdding?: boolean
 }
 
-export function SearchResult({ game, alreadyAdded, onAdd, onClick }: SearchResultProps) {
+export function SearchResult({ game, alreadyAdded, onAdd, onClick, isAdding }: SearchResultProps) {
   return (
     <div
       className="search-result scan-hover flex items-center gap-3 p-3 cursor-pointer transition-all hover:bg-white/[0.02]"
@@ -40,6 +41,13 @@ export function SearchResult({ game, alreadyAdded, onAdd, onClick }: SearchResul
           style={{ color: 'var(--text-muted)', border: '1px solid var(--border-color)' }}
         >
           Adicionado
+        </span>
+      ) : isAdding ? (
+        <span
+          className="add-btn flex-shrink-0 loading-pulse pointer-events-none"
+          style={{ color: 'var(--neon-green)', borderColor: 'var(--neon-green)' }}
+        >
+          ···
         </span>
       ) : (
         <button

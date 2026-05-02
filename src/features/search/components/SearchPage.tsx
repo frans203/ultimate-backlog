@@ -29,6 +29,10 @@ export function SearchPage() {
   const isAdded = (gameId: number) =>
     (userGames || []).some((g) => g.rawg_id === gameId)
 
+  const addingId = addGame.isPending
+    ? (addGame.variables as { rawg: RawgGame })?.rawg?.id
+    : undefined
+
   return (
     <section className="page-section" ref={bootRef}>
       <PageHeader title="BUSCAR JOGOS" />
@@ -68,6 +72,7 @@ export function SearchPage() {
                   alreadyAdded={isAdded(game.id)}
                   onAdd={() => addGame.mutate({ rawg: game })}
                   onClick={() => setSelectedGame(game)}
+                  isAdding={addingId === game.id}
                 />
               ))}
             </div>
@@ -85,10 +90,14 @@ export function SearchPage() {
         onClose={() => setSelectedGame(null)}
         onAdd={(description) => {
           if (selectedGame) {
-            addGame.mutate({ rawg: selectedGame, description })
+            addGame.mutate(
+              { rawg: selectedGame, description },
+              { onSuccess: () => setSelectedGame(null) },
+            )
           }
         }}
         alreadyAdded={selectedGame ? isAdded(selectedGame.id) : false}
+        isAdding={addGame.isPending}
       />
     </section>
   )

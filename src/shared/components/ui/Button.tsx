@@ -24,7 +24,7 @@ export function Button({ variant = 'primary', size = 'md', className, children, 
   return (
     <button
       className={cn(
-        'font-mono uppercase tracking-wider cursor-pointer transition-all border',
+        'font-mono uppercase tracking-wider cursor-pointer transition-all border disabled:opacity-50 disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],
         className

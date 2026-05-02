@@ -1,4 +1,4 @@
-import { Tabs, Select } from '@/shared/components/ui'
+import { Tabs, Dropdown } from '@/shared/components/ui'
 import { useStore } from '@/shared/store'
 import type { Game } from '@/shared/types/database.types'
 
@@ -28,42 +28,44 @@ export function GameFilters({ games }: GameFiltersProps) {
   const allPlatforms = [...new Set(games.flatMap((g) => g.platforms || []))].sort()
   const allGenres = [...new Set(games.flatMap((g) => g.genres || []))].sort()
 
+  const sortOptions = [
+    { value: 'added_at', label: 'Recentes' },
+    { value: 'name', label: 'Nome' },
+    { value: 'rating', label: 'Avaliação' },
+    { value: 'hours', label: 'Horas' },
+  ]
+
+  const platformOptions = [
+    { value: '', label: 'Plataforma' },
+    ...allPlatforms.map((p) => ({ value: p, label: p })),
+  ]
+
+  const genreOptions = [
+    { value: '', label: 'Gênero' },
+    ...allGenres.map((g) => ({ value: g, label: g })),
+  ]
+
   return (
     <>
       <div className="mb-4">
         <Tabs value={activeTab} onChange={(v) => setActiveTab(v as any)} items={tabs} />
       </div>
       <div className="flex flex-wrap gap-2 mb-4">
-        <select
-          className="cyber-select"
+        <Dropdown
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as any)}
-        >
-          <option value="added_at">Recentes</option>
-          <option value="name">Nome</option>
-          <option value="rating">Avaliação</option>
-          <option value="hours">Horas</option>
-        </select>
-        <select
-          className="cyber-select"
+          onChange={(v) => setSortBy(v as any)}
+          options={sortOptions}
+        />
+        <Dropdown
           value={filterPlatform}
-          onChange={(e) => setFilterPlatform(e.target.value)}
-        >
-          <option value="">Plataforma</option>
-          {allPlatforms.map((p) => (
-            <option key={p} value={p}>{p}</option>
-          ))}
-        </select>
-        <select
-          className="cyber-select"
+          onChange={setFilterPlatform}
+          options={platformOptions}
+        />
+        <Dropdown
           value={filterGenre}
-          onChange={(e) => setFilterGenre(e.target.value)}
-        >
-          <option value="">Gênero</option>
-          {allGenres.map((g) => (
-            <option key={g} value={g}>{g}</option>
-          ))}
-        </select>
+          onChange={setFilterGenre}
+          options={genreOptions}
+        />
       </div>
     </>
   )
